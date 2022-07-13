@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 mongoose.Promise = global.Promise
 
-const modelSchema = new mongoose.Schema({
+export const modelSchema = new mongoose.Schema({
   name: String
 })
 
