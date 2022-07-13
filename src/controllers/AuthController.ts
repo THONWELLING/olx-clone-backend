@@ -14,7 +14,36 @@ dotenv.config()
 
 export const AuthController = {
   signIn: async(req: Request, res: Response) => {
+    const errors = validationResult(req)
+    if(!errors.isEmpty()) {
+      res.json({ error: errors.mapped() })
+      return
+    }
+    const data = matchedData(req)
 
+    //Validando o email
+    let user = await User.findOne({ email: data.email })
+    if (!user) {
+      res.json({ error: 'Invalid Email And/Or Password!!!' })
+      return
+    }
+
+    //Validando A Senha
+    const match = await bcrypt.compare(data.password, user.passwordHash)
+    if (!match) {
+      res.json({ error: 'Invalid Email And/Or Password!!!' })
+      return
+    }
+
+     let token = JWT.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '15d' }
+    )
+    user.token = token
+    await user.save()
+
+    res.json({ token, email:data.email })
   },
 
   signUp: async(req: Request, res: Response) => {

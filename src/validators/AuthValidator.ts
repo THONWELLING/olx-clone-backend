@@ -25,6 +25,20 @@ export  const authValidator = {
       notEmpty: true,
       errorMessage: 'The State Has Not Been Filled'
     }
+  }),
+
+  signIn: checkSchema({
+    email: {
+      isEmail: true,
+      normalizeEmail: true,
+      errorMessage: 'Invalid Email'
+    },
+    password: {
+      isLength: {
+        options: { min: 8 }
+      },
+      errorMessage: 'Minimum 8 Characters Is Required To Password'
+    }
   })
 }
 
