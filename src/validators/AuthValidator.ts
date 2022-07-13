@@ -19,7 +19,7 @@ export  const authValidator = {
       isLength: {
         options: { min: 8 }
       },
-      errorMessage: 'Minimum 2 Characters Is Required To Password'
+      errorMessage: 'Minimum 8 Characters Is Required To Password'
     },
     state: {
       notEmpty: true,
