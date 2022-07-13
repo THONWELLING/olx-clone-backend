@@ -4,6 +4,8 @@ import { AuthController } from './controllers/AuthController'
 import { AdsController } from './controllers/AdsController'
 import { UserController } from './controllers/UserController'
 
+import { authValidator } from './validators/AuthValidator'
+
 
 const router = express.Router()
 
@@ -17,7 +19,7 @@ router.get('/states', UserController.getStates)
 
 //Rotas de usuário
 router.post('/user/signin', AuthController.signIn)  //login
-router.post('/user/signup', AuthController.signUp)  //cadastro
+router.post('/user/signup', authValidator.signUp, AuthController.signUp)  //cadastro
 
 router.get('/user/me', UserController.info) //informações
 router.put('/user/me', UserController.editAction) // editar
