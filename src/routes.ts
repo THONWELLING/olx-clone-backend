@@ -16,8 +16,8 @@ router.get('/ping', (req: Request, res: Response) => {
 router.get('/states', UserController.getStates)
 
 //Rotas de usuário
-router.post('/user/signin', UserController.signIn)  //login
-router.post('/user/signup', UserController.signUp)  //cadastro
+router.post('/user/signin', AuthController.signIn)  //login
+router.post('/user/signup', AuthController.signUp)  //cadastro
 
 router.get('/user/me', UserController.info) //informações
 router.put('/user/me', UserController.editAction) // editar
