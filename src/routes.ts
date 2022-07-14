@@ -4,6 +4,7 @@ import { AuthController } from './controllers/AuthController'
 import { AdsController } from './controllers/AdsController'
 import { UserController } from './controllers/UserController'
 
+import { Auth } from './middlewares/Auth'
 import { authValidator } from './validators/AuthValidator'
 
 
@@ -21,8 +22,8 @@ router.get('/states', UserController.getStates)
 router.post('/user/signin', authValidator.signIn, AuthController.signIn)  //login
 router.post('/user/signup', authValidator.signUp, AuthController.signUp)  //cadastro
 
-router.get('/user/me', UserController.info) //informações
-router.put('/user/me', UserController.editAction) // editar
+router.get('/user/me', Auth.private, UserController.info) //informações
+router.put('/user/me', Auth.private, UserController.editAction) // editar
 
 //Rota de categorias
 router.get('/categories', AdsController.getCategories) 

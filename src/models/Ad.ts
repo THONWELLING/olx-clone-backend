@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+
+
 mongoose.Promise = global.Promise
 
 const modelSchema = new mongoose.Schema({
