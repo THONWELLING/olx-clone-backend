@@ -6,6 +6,7 @@ import { UserController } from './controllers/UserController'
 
 import { Auth } from './middlewares/Auth'
 import { authValidator } from './validators/AuthValidator'
+import { UserValidator } from  './validators/UserValidator'
 
 
 const router = express.Router()
@@ -23,7 +24,7 @@ router.post('/user/signin', authValidator.signIn, AuthController.signIn)  //logi
 router.post('/user/signup', authValidator.signUp, AuthController.signUp)  //cadastro
 
 router.get('/user/me', Auth.private, UserController.info) //informações
-router.put('/user/me', Auth.private, UserController.editAction) // editar
+router.put('/user/me', UserValidator.editAction, Auth.private, UserController.editAction) // editar
 
 //Rota de categorias
 router.get('/categories', AdsController.getCategories) 
