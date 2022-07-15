@@ -11,7 +11,7 @@ export const AdsController = {
     let categories =[]
     for(let i in cats) {
       categories.push({
-        ...cats[i],
+        ...cats[i]._doc,
         img: `${process.env.BASE}/assets/images/${cats[i].slug}.png`
       })
     }
