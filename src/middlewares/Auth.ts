@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import JWT from 'jsonwebtoken'
-const User = require('../models/User')
+import User from '../models/User';
 
 export const Auth = {
-  private: async (req: Request, res: Response, next: NextFunction) => {
+  private: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     
     /* VERSÃO SIMPLIFICADA COM IF
       if (req.query.token || req.body.token) {
@@ -22,8 +22,8 @@ export const Auth = {
     let success = false
 
     // Fazer verificação de auth
-    if(req.query.token || req.body.token) {
-      const token = req.query.token || req.body.token
+    if(req.headers.authorization) {
+      const token =  req.headers.authorization.split(' ')[1];
       if(token) {
         try {
           JWT.verify(token, process.env.JWT_SECRET as string)

@@ -1,9 +1,23 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document, Model } from 'mongoose'
 
 
-mongoose.Promise = global.Promise
 
-const modelSchema = new mongoose.Schema({
+export interface IAd extends Document {
+  idUser: String,
+  state: String,
+  category: String,
+  images: [Object],
+  dateCreated: Date,
+  title: String,
+  price: Number,
+  priceNegotiable: Boolean,
+  description: String,
+  views: Number,
+  status: String
+}
+
+
+const adSchema: Schema = new Schema<IAd>({
   idUser: String,
   state: String,
   category: String,
@@ -17,10 +31,13 @@ const modelSchema = new mongoose.Schema({
   status: String
 })
 
-const modelName = 'Ad'
+const modelName = "Ad";
+const isConnected = mongoose.connection;
+const modelExists = mongoose.connection.models[modelName];
+const modelExistsInConnection = isConnected && modelExists;
 
-if(mongoose.connection && mongoose.connection.models[modelName]) {
-  module.exports = mongoose.connection.models[modelName]
-} else {
-  module.exports = mongoose.model(modelName, modelSchema)
-}
+const Ad = modelExistsInConnection
+  ? mongoose.connection.models[modelName]
+  : mongoose.model(modelName, adSchema);
+
+export default Ad as Model<IAd>;

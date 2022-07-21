@@ -3,10 +3,10 @@ import { validationResult, matchedData } from "express-validator";
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt'
 
-const State = require('../models/State') 
-const User = require('../models/User') 
-const Category = require('../models/Category') 
-const Ad = require('../models/Ad') 
+import State from '../models/State'; 
+import User, { IUser } from '../models/User'; 
+import Category from '../models/Category'; 
+import Ad from '../models/Ad'; 
 
 
 
@@ -18,19 +18,21 @@ export const UserController = {
     res.json({ states })
   },
 
-  info: async(req: Request, res: Response) => {
-    let token = req.query.token
+  info: async (req: Request, res: Response ) => {
+    const token = req.headers.authorization?.split(' ')[1] as string
 
-    const user = await User.findOne({ token })
+    
+    const user = await User<IUser>.findOne({where: { token }})
+    console.log('USER: ', user)
     const state = await State.findById(user.state)
     const ads = await Ad.find({ idUser: user._id.toString() })
 
-  //LISTA DE ANÚNCIOS
+   //LISTA DE ANÚNCIOS
     let adList = []
     for (let i in ads) {
       
-      const categories = await Category.findById(ads[i].category)
-      adList.push({ ...ads[i], category: categories.slug })
+      const cat = await Category.findById(ads[i].category)
+      adList.push({ ...ads[i], category: cat.slug })
     }
 
     return res.json({
@@ -39,6 +41,7 @@ export const UserController = {
       state: state.name,
       ads: adList
     })
+   res.json({})
   },
 
   editAction: async(req: Request, res: Response) => {

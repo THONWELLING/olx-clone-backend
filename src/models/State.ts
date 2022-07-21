@@ -1,15 +1,23 @@
-import mongoose, { STATES } from "mongoose";
-mongoose.Promise = global.Promise
+import mongoose, { Schema, Document, Model } from 'mongoose'
 
-const modelSchema = new mongoose.Schema({
+export interface IState extends Document {
+  name: string
+}
+
+const stateSchema: Schema = new Schema<IState>({
   name: String
 })
 
-const modelName = 'State'
 
-if(mongoose.connection && mongoose.connection.models[modelName]) {
-  module.exports = mongoose.connection.models[modelName]
-} else {
-  module.exports = mongoose.model(modelName, modelSchema)
-}
+const modelName = "State";
+const isConnected = mongoose.connection;
+const modelExists = mongoose.connection.models[modelName];
+const modelExistsInConnection = isConnected && modelExists;
+
+const State = modelExistsInConnection
+  ? mongoose.connection.models[modelName]
+  : mongoose.model(modelName, stateSchema);
+
+export default State as Model<IState>;
+
 

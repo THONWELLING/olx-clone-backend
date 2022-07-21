@@ -5,8 +5,8 @@ import { validationResult, matchedData } from "express-validator";
 import JWT from "jsonwebtoken";
 import dotenv from 'dotenv'
 
-const User = require('../models/User')
-const State = require('../models/State')
+import User from '../models/User';
+import State from '../models/State';
 
 
 dotenv.config()
