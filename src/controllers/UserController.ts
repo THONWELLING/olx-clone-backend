@@ -3,13 +3,20 @@ import { validationResult, matchedData } from "express-validator";
 import mongoose from "mongoose";
 import bcrypt from 'bcrypt'
 
-import State from '../models/State'; 
+import State,{ IState} from '../models/State'; 
 import User, { IUser } from '../models/User'; 
-import Category from '../models/Category'; 
-import Ad from '../models/Ad'; 
+import Category, { ICategory } from '../models/Category'; 
+import Ad, { IAd } from '../models/Ad'; 
 
 
 
+
+type Updates = {
+  name?: string
+  email?: string
+  passwordHash?: string
+  state?: string
+}
 
 
 export const UserController = {
@@ -22,26 +29,25 @@ export const UserController = {
     const token = req.headers.authorization?.split(' ')[1] as string
 
     
-    const user = await User<IUser>.findOne({where: { token }})
+    const user = await User<IUser>.findOne({ token })
     console.log('USER: ', user)
-    const state = await State.findById(user.state)
-    const ads = await Ad.find({ idUser: user._id.toString() })
+    const state = await State<IState>.findById(user?.state)
+    const ads = await Ad<IAd>.find({ idUser: user?._id.toString()})
 
    //LISTA DE ANÚNCIOS
     let adList = []
     for (let i in ads) {
-      
-      const cat = await Category.findById(ads[i].category)
-      adList.push({ ...ads[i], category: cat.slug })
+      const cat = await Category<ICategory>.findById(ads[i].category)
+      adList.push({ ...ads[i], category: cat?.slug })
     }
 
     return res.json({
-      name: user.name,
-      email: user.email,
-      state: state.name,
+      name: user?.name,
+      email: user?.email,
+      state: state?.name,
       ads: adList
     })
-   res.json({})
+  
   },
 
   editAction: async(req: Request, res: Response) => {
@@ -52,9 +58,7 @@ export const UserController = {
     }
     const data = matchedData(req)
 
-    const user = await User.findOne({ token: data.token })
-
-      let updates = {...data}
+      let updates: Updates = {...data}
 
       if (data.name) {
         updates.name = data.name
@@ -70,7 +74,6 @@ export const UserController = {
 
       if(data.state) {
         if (mongoose.Types.ObjectId.isValid(data.state)) {
-          
           const stateCheck = await State.findById(data.state)
           if(!stateCheck) {
             res.json({ error: 'Invalid State' })
@@ -85,6 +88,7 @@ export const UserController = {
       }
 
     await User.findOneAndUpdate({ token: data.token}, {$set: updates})
+    res.json({})
 
   }
 }

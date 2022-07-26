@@ -1,4 +1,5 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import 'express-async-errors'
 import mongoConnect from "./database/mongo";
 import path from "path";
 import cors from "cors";

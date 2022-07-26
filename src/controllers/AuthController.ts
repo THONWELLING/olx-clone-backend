@@ -43,7 +43,7 @@ export const AuthController = {
     user.token = token
     await user.save()
 
-    res.json({ token, email:data.email })
+    res.json({ token, email: data.email })
   },
 
   signUp: async(req: Request, res: Response) => {
@@ -95,11 +95,5 @@ export const AuthController = {
       res.json({ error: {email: {msg: 'Email Already Exists'}} })
       return
     }
-
-
-    
-
-   
-    res.json({tudocerto: true, data})
   }
 }

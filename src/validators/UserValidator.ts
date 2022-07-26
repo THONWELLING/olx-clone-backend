@@ -4,7 +4,7 @@ import { checkSchema } from "express-validator"
 export  const UserValidator = {
   editAction: checkSchema({
     token: {
-      notEmpty: true,
+      notEmpty: true
     },
     name:{
       optional: true,
