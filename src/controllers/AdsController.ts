@@ -1,18 +1,29 @@
 import { Request, Response } from "express";
 import { v4 } from 'uuid'
-import Jimp from "jimp/*";
+import Jimp from "jimp";
 
 import Category, {ICategory} from '../models/Category';
 import User, { IUser } from '../models/User';
 import Ad, { IAd } from '../models/Ad';
 
+//MANIPULANDO E ADICINANDO IMAGEM DE ANÚNCIO 
+const addImage = async (buffer: string) => {
+  let newName = `${uuid()}.jpg`
+  let tmpImg = await Jimp.read(buffer)
+  tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`)
+  return newName
+}
+
 
 export const AdsController = {
   getCategories: async(req: Request, res: Response) => {
+
+    //PEGANDO AS CATEGORIAS NOBANCO DE DADOS 
     const cats = await Category<ICategory>.find()
     console.log("Categorias: ", cats)
     let categories =[]
 
+    //MONTANDO E INSERINDO URL DE IMAGENS DAS CATEGORIAS 
     for(let i in cats) {
       categories.push({
         ...cats[i],
@@ -24,40 +35,48 @@ export const AdsController = {
   },
 
   addAction: async(req: Request, res: Response) => {
-      // let { title, price, priceneg, desc, cat, token } = req.body
-      // const user = await User<IUser>.findOne({token}).exec()
+      let { title, price, priceneg, desc, cat, token } = req.body
+      const user = await User<IUser>.findOne({token})
 
-      // if(!title || !cat) {
-      //   res.json({ error: 'Title And/Or Category Are Not Filed' })
-      //   return
-      // }
 
-      // if (price) {
-      //   price = price.replace('.', '').replace(',', '.').replace('R$ ', '')
-      //   price = parseFloat(price)
-      // } else {
-      //   price = 0
-      // }
+      //VERIFICANDO SE TEM TÍTULO  E CATEGORIA * PQ SÃO OBRIGATÓRIOS
+      if(!title || !cat) {
+        res.json({ error: 'Title And/Or Category Are Not Filed' })
+        return
+      }
 
-      // const newAd = new Ad<IAd>()
-      // newAd.status = true
-      // newAd.idUser = user._id
-      // newAd.state = user.state
-      // newAd.dateCreated = new Date()
-      // newAd.title = title
-      // newAd.price = price
-      // newAd.priceNegotiable = (priceneg === 'true' ) ? true : false
-      // newAd.description = desc
-      // newAd.views = 0
+      //FORMATANDO O VALOR DO PREÇO
+      if (price) {
+        price = price.replace('.', '').replace(',', '.').replace('R$ ', '')
+        price = parseFloat(price)
+      } else {
+        price = 0
+      }
 
-      // if (req.files && req.files.img) {
-      //   if(req.files.img.length == undefined) {
 
-      //   }
-      // }
+      //ADICIONANDO NOVO ANÚNCIO 
+      const newAd = new Ad<IAd>()
+      newAd.status = true
+      newAd.idUser = user?._id
+      newAd.state = user?.state as string
+      newAd.dateCreated = new Date()
+      newAd.title = title
+      newAd.category = cat
+      newAd.price = price
+      newAd.priceNegotiable = (priceneg === 'true' ) ? true : false
+      newAd.description = desc
+      newAd.views = 0
 
-      // const info = await newAd.save()
-      // res.json({ id: info._id })
+      if (req.files && req.files.img) {
+        if(req.files.img == undefined) {
+
+        } else {
+
+        }
+      }
+
+      const info = await newAd.save()
+      res.json({ id: info._id })
   },
 
   getList: async(req: Request, res: Response) => {
@@ -72,4 +91,8 @@ export const AdsController = {
 
   },
   
+}
+
+function uuid() {
+  throw new Error("Function not implemented.");
 }

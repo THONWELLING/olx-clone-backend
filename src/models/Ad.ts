@@ -13,7 +13,7 @@ export interface IAd extends Document {
   priceNegotiable: Boolean,
   description: String,
   views: Number,
-  status: String
+  status: Boolean
 }
 
 
