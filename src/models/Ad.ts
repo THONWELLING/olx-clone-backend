@@ -28,7 +28,7 @@ const adSchema: Schema = new Schema<IAd>({
   priceNegotiable: Boolean,
   description: String,
   views: Number,
-  status: String
+  status: Boolean
 })
 
 const modelName = "Ad";

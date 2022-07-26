@@ -30,9 +30,9 @@ router.put('/user/me', UserValidator.editAction, Auth.private, UserController.ed
 router.get('/categories', AdsController.getCategories) 
 
 //Rotas de Anúncios
-router.post('/ad/add', AdsController.addAction) // adicionar anúncio 
+router.post('/ad/add', Auth.private, AdsController.addAction) // adicionar anúncio 
 router.get('/ad/list', AdsController.getList)  //pegar lista de anúncios
 router.get('/ad/item', AdsController.getItem)  // adicionar um item
-router.post('/ad/:id', AdsController.editAction)  // editar anúncio
+router.post('/ad/:id', Auth.private, AdsController.editAction)  // editar anúncio
 
 export default  router
