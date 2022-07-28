@@ -7,12 +7,12 @@ export const Auth = {
     let success = false
 
     // Fazer verificação de auth
-    if(req.headers.authorization) {
-      const [authType, token] =  req.headers.authorization.split(' ')
-      console.log("authType: ", authType)
+    if(req.body.token) {
+      const token =  req.body.token
+      // console.log("authType: ", authType)
       console.log("token:", token)
 
-      if(authType === 'Bearer') {
+      if(token) {
         try {
           JWT.verify(token, process.env.JWT_SECRET as string)
           success = true

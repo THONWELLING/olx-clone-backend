@@ -26,9 +26,9 @@ export const UserController = {
   },
 
   info: async (req: Request, res: Response ) => {
-    const token = req.headers.authorization?.split(' ')[1] as string
+    const token = req.body.token
 
-    
+    console.log('token do userController info: ', token)
     const user = await User<IUser>.findOne({ token })
     console.log('USER: ', user)
     const state = await State<IState>.findById(user?.state)
@@ -58,13 +58,15 @@ export const UserController = {
     }
     const data = matchedData(req)
 
+    console.log("INFORMAÇÕES DO DATA  EDITACTION => ", data)
+    console.log("TOKEN DO EDIT ACTION => ", data.token)
       let updates: Updates = {...data}
 
       if (data.name) {
         updates.name = data.name
       }
       if (data.email) {
-        const emailCheck = await User.findOne({ email: data.email })
+        const emailCheck = await User<IUser>.findOne({ email: data.email })
         if(emailCheck) {
           res.json({ error: 'There Is Already A User With This Email' })
           return
@@ -74,7 +76,7 @@ export const UserController = {
 
       if(data.state) {
         if (mongoose.Types.ObjectId.isValid(data.state)) {
-          const stateCheck = await State.findById(data.state)
+          const stateCheck = await State<IState>.findById(data.state)
           if(!stateCheck) {
             res.json({ error: 'Invalid State' })
             return
@@ -87,7 +89,7 @@ export const UserController = {
         updates.passwordHash = await bcrypt.hash(data.password, 10)
       }
 
-    await User.findOneAndUpdate({ token: data.token}, {$set: updates})
+    await User<IUser>.findOneAndUpdate({ token: data.token}, {$set: updates})
     res.json({})
 
   }

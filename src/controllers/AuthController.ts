@@ -5,11 +5,12 @@ import { validationResult, matchedData } from "express-validator";
 import JWT from "jsonwebtoken";
 import dotenv from 'dotenv'
 
-import User from '../models/User';
-import State from '../models/State';
+import User,{ IUser } from '../models/User';
+import State, { IState } from '../models/State';
 
 
 dotenv.config()
+
 
 
 export const AuthController = {
@@ -22,7 +23,7 @@ export const AuthController = {
     const data = matchedData(req)
 
     //Validando o email
-    let user = await User.findOne({ email: data.email })
+    let user = await User<IUser>.findOne({ email: data.email })
     if (!user) {
       res.json({ error: 'Invalid Email And/Or Password!!!' })
       return
@@ -35,6 +36,7 @@ export const AuthController = {
       return
     }
 
+    //GERANDO UM TOKEN COM JWT
      let token = JWT.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET as string,
@@ -55,11 +57,11 @@ export const AuthController = {
     const data = matchedData(req)
     
     //verificando se email já existe
-    let hasUser = await User.findOne({ email: data.email })
+    let hasUser = await User<IUser>.findOne({ email: data.email })
     //verificando se o estado existe
     if (mongoose.Types.ObjectId.isValid(data.state)) {
       
-      const stateItem = await State.findById(data.state)
+      const stateItem = await State<IState>.findById(data.state)
       if (!stateItem) {
         res.json({ error: {state:{msg: 'This State Does Not Exists'}} })
         return
@@ -73,11 +75,11 @@ export const AuthController = {
       const passwordHash = bcrypt.hashSync(data.password, 10)
 
       //criando novo usuário
-      const newUser = new User({
-        name: data.name,
+      const newUser: IUser = new User({
+        name: data.name ,
         email: data.email,
         passwordHash,
-        state: data.state,
+        state: data.state
       })
 
       //criando token para o novo usuário

@@ -1,12 +1,14 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import 'express-async-errors'
 import mongoConnect from "./database/mongo";
 import path from "path";
 import cors from "cors";
-import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import apiRoutes from './routes'
+
+
+import { errorHandler } from './middlewares/multerErrors'
 
 
 
@@ -24,10 +26,18 @@ server.use(cors());
 server.use(express.json());
 server.use(express.static(path.join(__dirname + "public")));
 server.use(express.urlencoded({ extended: true }));
-server.use(fileUpload());
+
 
 
 server.use('/', apiRoutes)
+
+server.use((req: Request, res: Response) => {
+  res.status(404)
+  res.json({ error: 'Endpoint Not Found' })
+})
+
+
+server.use(errorHandler)
 
 server.listen(process.env.PORT as string, () => {
   console.log(`Server is Running At The: ${process.env.BASE}`);

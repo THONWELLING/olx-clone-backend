@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
-import { v4 } from 'uuid'
-import Jimp from "jimp";
+import  'uuid'
+
 
 import Category, {ICategory} from '../models/Category';
 import User, { IUser } from '../models/User';
 import Ad, { IAd } from '../models/Ad';
 
-//MANIPULANDO E ADICINANDO IMAGEM DE ANÚNCIO 
-const addImage = async (buffer: string) => {
-  let newName = `${uuid()}.jpg`
-  let tmpImg = await Jimp.read(buffer)
-  tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`)
-  return newName
-}
+//MANIPULANDO E ADICIONANDO IMAGEM DE ANÚNCIO 
+// const addImage = async (buffer: string) => {
+//   let newName = `${uuid()}.jpg`
+//   let tmpImg = await Jimp.read(buffer)
+//   tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`)
+//   return newName
+// }
 
 
 export const AdsController = {
@@ -67,14 +67,14 @@ export const AdsController = {
       newAd.description = desc
       newAd.views = 0
 
-      if (req.files && req.files.img) {
-        if(req.files.img == undefined) {
+      if(req.files) {
+        
 
-        } else {
-
-        }
+        res.json({})
+      } else {
+        res.status(400)
+        res.json({error: 'invalid file'})
       }
-
       const info = await newAd.save()
       res.json({ id: info._id })
   },
