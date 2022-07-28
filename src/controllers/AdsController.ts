@@ -5,14 +5,22 @@ import  'uuid'
 import Category, {ICategory} from '../models/Category';
 import User, { IUser } from '../models/User';
 import Ad, { IAd } from '../models/Ad';
+import sharp from "sharp";
 
 //MANIPULANDO E ADICIONANDO IMAGEM DE ANÚNCIO 
-// const addImage = async (buffer: string) => {
-//   let newName = `${uuid()}.jpg`
-//   let tmpImg = await Jimp.read(buffer)
-//   tmpImg.cover(500, 500).quality(80).write(`./public/media/${newName}`)
-//   return newName
-// }
+const addImage = async (req: Request, res: Response) => {
+  if (req.file?.path) {
+    await sharp(req.file?.path)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .toFile(`./public/media/${req.file.filename}.jpg`)
+
+    res.json({ image:`${req.file.filename}.jpg` })
+  } else {
+    res.status(400)
+    res.json({error: 'invalid file'})
+  }
+}
 
 
 export const AdsController = {
@@ -67,14 +75,7 @@ export const AdsController = {
       newAd.description = desc
       newAd.views = 0
 
-      if(req.files) {
-        
-
-        res.json({})
-      } else {
-        res.status(400)
-        res.json({error: 'invalid file'})
-      }
+      
       const info = await newAd.save()
       res.json({ id: info._id })
   },
