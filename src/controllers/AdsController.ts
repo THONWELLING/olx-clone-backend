@@ -1,26 +1,27 @@
+import { unlink } from "fs/promises";
 import { Request, Response } from "express";
-import  'uuid'
+
 
 
 import Category, {ICategory} from '../models/Category';
 import User, { IUser } from '../models/User';
 import Ad, { IAd } from '../models/Ad';
+import State, {IState} from "../models/State";
 import sharp from "sharp";
 
-//MANIPULANDO E ADICIONANDO IMAGEM DE ANÚNCIO 
-const addImage = async (req: Request, res: Response) => {
-  if (req.file?.path) {
-    await sharp(req.file?.path)
-    .resize(500, 500)
-    .toFormat('jpeg')
-    .toFile(`./public/media/${req.file.filename}.jpg`)
 
-    res.json({ image:`${req.file.filename}.jpg` })
-  } else {
-    res.status(400)
-    res.json({error: 'invalid file'})
-  }
-}
+
+// type Data = {
+//   title: string
+//   category: string
+//   price: string
+//   state: string
+//   priceNegotiable: string
+//   description: string
+//   delImages?: string
+//   status?: string
+// }
+
 
 
 export const AdsController = {
@@ -42,25 +43,48 @@ export const AdsController = {
     res.json({ categories })
   },
 
-  addAction: async(req: Request, res: Response) => {
-      let { title, price, priceneg, desc, cat, token } = req.body
-      const user = await User<IUser>.findOne({token})
+  addAction: async( req: Request, res: Response) => {
+    let { title, price, priceneg, desc, cat, token } = req.body
+
+    const user = await User<IUser>.findOne({token})
 
 
-      //VERIFICANDO SE TEM TÍTULO  E CATEGORIA * PQ SÃO OBRIGATÓRIOS
-      if(!title || !cat) {
-        res.json({ error: 'Title And/Or Category Are Not Filed' })
-        return
-      }
+    //VERIFICANDO SE TEM TÍTULO  E CATEGORIA * PQ SÃO OBRIGATÓRIOS
+    if(!title || !Category) {
+      res.json({ error: 'Title And/Or Category Are Not Filed' })
+      return
+    }
 
-      //FORMATANDO O VALOR DO PREÇO
-      if (price) {
-        price = price.replace('.', '').replace(',', '.').replace('R$ ', '')
-        price = parseFloat(price)
-      } else {
-        price = 0
-      }
+    //FORMATANDO O VALOR DO PREÇO
+    if (price) {
+      price = price.replace('.', '').replace(',', '.').replace('R$ ', '')
+      price = parseFloat(price)
+    } else {
+      price = 0
+    }
 
+
+    //imagens
+     let images: string[]= []
+
+    if (req.files) {
+      let files = req.files as Express.Multer.File[]
+
+      files.forEach( async (item) => {
+        images.push(item.filename)
+        await sharp(item.path)
+        .resize(500, 500)
+        .toFormat("jpeg")
+        .toFile(`./public/media/${item.filename}.jpg`)
+
+        await unlink (item.path)
+        
+        res.json({ images:`${item.filename}` })
+      })
+    } else {
+        res.status(400)
+        res.json({error: 'invalid file'})
+    }
 
       //ADICIONANDO NOVO ANÚNCIO 
       const newAd = new Ad<IAd>()
@@ -73,9 +97,10 @@ export const AdsController = {
       newAd.price = price
       newAd.priceNegotiable = (priceneg === 'true' ) ? true : false
       newAd.description = desc
-      newAd.views = 0
-
+      newAd.views = 0,
+      images
       
+
       const info = await newAd.save()
       res.json({ id: info._id })
   },
@@ -92,8 +117,4 @@ export const AdsController = {
 
   },
   
-}
-
-function uuid() {
-  throw new Error("Function not implemented.");
 }
